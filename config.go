@@ -5,6 +5,7 @@ import (
 	"github.com/spf13/viper"
 	"log"
 	"os"
+	"strings"
 	"sync"
 )
 
@@ -25,7 +26,31 @@ var (
 type hConfig struct {}
 
 func (h *hConfig) Str(key string) string {
-	return viper.GetString(key)
+	value := viper.GetString(key)
+	if len(value) == 0 {
+		return h.getStringWithComplicatedKey(key)
+	}
+	return value
+}
+
+func (h *hConfig) getStringWithComplicatedKey(key string) string {
+	subKeys := strings.Split(key, "_")
+	for idx, subKey := range subKeys {
+		if idx < (len(subKeys) - 1) {
+			values := viper.Get(subKey)
+			valueMap := values.(map[string]interface{})
+			v, ok := valueMap[strings.ToLower(subKeys[idx + 1])]
+			if ok {
+				return v.(string)
+			}
+		}
+	}
+
+	return ""
+}
+
+func (h *hConfig) Get(key string) interface{} {
+	return viper.Get(key)
 }
 
 func (h *hConfig) Int(key string) int {
@@ -96,6 +121,9 @@ func SetType(_type string) {
 	configType = _type
 }
 
+func Get(key string) interface{} {
+	return getInstance().Get(key)
+}
 func Str(key string) string {
 	return getInstance().Str(key)
 }
