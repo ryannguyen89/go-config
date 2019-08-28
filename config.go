@@ -48,3 +48,7 @@ func Int(key string) int {
 func Int32(key string) int32 {
 	return viper.GetInt32(key)
 }
+
+func Debug() {
+	viper.Debug()
+}
