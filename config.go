@@ -38,10 +38,12 @@ func (h *hConfig) getStringWithComplicatedKey(key string) string {
 	for idx, subKey := range subKeys {
 		if idx < (len(subKeys) - 1) {
 			values := viper.Get(subKey)
-			valueMap := values.(map[string]interface{})
-			v, ok := valueMap[strings.ToLower(subKeys[idx + 1])]
-			if ok {
-				return v.(string)
+			if values != nil {
+				valueMap := values.(map[string]interface{})
+				v, ok := valueMap[strings.ToLower(subKeys[idx + 1])]
+				if ok {
+					return v.(string)
+				}
 			}
 		}
 	}
